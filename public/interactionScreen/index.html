@@ -1,0 +1,28 @@
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaja com a tela</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <video autoplay muted id="camera"></video>
+    </div>
+    <div class="wrapper">
+        <div id="btnInteragir">
+            <h1 class="wrapTxt">Interaja<span class="mask"></span></h1>
+        </div>
+        <span id="aim"></span>
+        <div id="output">
+            <h2 class="wrapTxt">Confira o processo!<span class="mask"></span></h2>
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
