@@ -22,26 +22,34 @@ const app = express();
 app.use(express.static(__dirname + '/public'));
 
 app.all('/', function (req, res) {
-  res.redirect('interactionScreen');
+  res.redirect('screen');
 });
 
 const httpsServer = createServer(credentials, app);
 const io = new Server(httpsServer);
 
+const drawconsoleline = ()=>{console.log('\n----------------------------------\n')};
+
 httpsServer.listen(port,ip, () => {
+    drawconsoleline();
     console.log('\nServidor HTTPS pronto para uso\n');
     console.log(`\naddress: https://${ip}:${port}\n`);
 });
-
+var lastcolor = undefined;
 io.on('connection', (socket) => {
   socket.on('click', (position) => {
-    console.log(`\n Socket:${socket.id}  Clicou em X:${position.x} Y:${position.y}`);
+    drawconsoleline();
+    console.log(`\nSocket:${socket.id}  Clicou em X:${position.x} Y:${position.y}`);
     socket.broadcast.emit('click',position);
   });
   socket.on('changeColor', (color) =>{
-    console.log(`\n Trocar cor para: ${color.color}\n`);
+    drawconsoleline();
+    console.log(`\nTrocar cor para: ${color.color}\n`);
+    lastcolor = color;
     socket.broadcast.emit('changeColor', color);
   });
+  drawconsoleline();
+  socket.emit("changeColor",lastcolor);
   console.log('\nUm novo site foi conectado!\n');
 });
 

@@ -10,14 +10,15 @@ const socket = io();
 //CONFIGS
 const clickCoolDown = 250;
 var pointHUE = 0;
-const hueOffset = 10;
+const hueOffset = 2;
 var saturation = 0;
 const sOffset = 20;
 var lumination = 0;
-const lOffset = 15;
+const lOffset = 20;
 const maxWidth = 1280;
 const maxHeight = 720;
 
+const convergenceTries = 6;
 const setRearCamera = async () =>{
     if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
         stream = await navigator.mediaDevices.getUserMedia({
@@ -78,7 +79,7 @@ function GetNormalizedPosition(videoinfo, point){
     if(points.length == 0) return undefined;
     //console.log('Pegou Pontos');
 
-    points = ConvergePoints(points,3);
+    points = ConvergePoints(points,convergenceTries);
     
     //  console.log(point.length)
     if(points.length != 4) {
@@ -426,27 +427,29 @@ function SendPositionToScreen(position){
 window.addEventListener('load', function() {
     setRearCamera();
     SetColor([260,40,60],true);
-    btnInteragir.addEventListener('click', async function(){
-        let newDate = new Date();
-        if(newDate.getTime() - lastclick.getTime() < clickCoolDown){return;}
-        lastclick = newDate;
-        if(!stream){alert('Por favor libere o acesso à câmera e reinicie a página!'); return;}
-        canvasTemp.width = camera.videoWidth;
-        canvasTemp.height = camera.videoHeight;
-        ctx = canvasTemp.getContext('2d');
-        ctx.drawImage(camera,0,0);
-        const scan = ctx.getImageData(0,0,camera.videoWidth,camera.videoHeight);
-        const normalizedPosition = GetNormalizedPosition([scan.data,camera.videoWidth,camera.videoHeight], [camera.videoWidth*0.5,camera.videoHeight*0.5]);
-
-        if(!normalizedPosition){
-            console.log("Retornou undefined");
-            //socket.emit('click',[0,0]);
-            return;
-        }
-        console.log(normalizedPosition)
-        SendPositionToScreen(normalizedPosition);
-    })
+    btnInteragir.addEventListener('click', interagir)
     socket.on('changeColor',(color) => {
         SetColor(color.color, color.type == 'hsl');
     });
 });
+
+const interagir = async function(){
+    let newDate = new Date();
+    if(newDate.getTime() - lastclick.getTime() < clickCoolDown){return;}
+    lastclick = newDate;
+    if(!stream){alert('Por favor libere o acesso à câmera e reinicie a página!'); return;}
+    canvasTemp.width = camera.videoWidth;
+    canvasTemp.height = camera.videoHeight;
+    ctx = canvasTemp.getContext('2d');
+    ctx.drawImage(camera,0,0);
+    const scan = ctx.getImageData(0,0,camera.videoWidth,camera.videoHeight);
+    const normalizedPosition = GetNormalizedPosition([scan.data,camera.videoWidth,camera.videoHeight], [camera.videoWidth*0.5,camera.videoHeight*0.5]);
+
+    if(!normalizedPosition){
+        console.log("Retornou undefined");
+        //socket.emit('click',[0,0]);
+        return;
+    }
+    console.log(normalizedPosition)
+    SendPositionToScreen(normalizedPosition);
+}
