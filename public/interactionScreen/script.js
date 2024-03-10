@@ -10,15 +10,16 @@ const socket = io();
 //CONFIGS
 const clickCoolDown = 250;
 var pointHUE = 0;
-const hueOffset = 2;
+const hueOffset = 40;
 var saturation = 0;
 const sOffset = 20;
 var lumination = 0;
-const lOffset = 20;
+const lOffset = 10;
 const maxWidth = 1280;
 const maxHeight = 720;
 
-const convergenceTries = 6;
+const convergenceTries = 0;
+
 const setRearCamera = async () =>{
     if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
         stream = await navigator.mediaDevices.getUserMedia({
@@ -72,7 +73,7 @@ function GetNormalizedPosition(videoinfo, point){
     //Blur(data,width,height,2);
 
     const smin = Math.max(0,saturation - sOffset);
-    const smax = Math.min(360,saturation + sOffset);
+    const smax = Math.min(100,saturation + sOffset);
     const lmin = Math.max(0,lumination - lOffset);
     const lmax = Math.min(100,lumination + lOffset);
     var points = GetPointsHSL(data,pointHUE,hueOffset,smin,smax,lmin,lmax, width);
@@ -189,9 +190,9 @@ function DataImageIndexToPoint(i, w){
 
 function GetPointsHSL(data, hue, hmof ,smin,smax,lmin,lmax, w){
     var min = hue - hmof;
-    min = min < 0 ? 360 + min : min
+    min = min < 0 ? 359 + (min%359) : min
     var max = hue + hmof;
-    max = max > 359 ? max - 359 : max
+    max = max > 359 ? max%359  : max
     const compare = (h) => {
         if(min > max)   
             return h >= min || h <= max;
@@ -202,10 +203,10 @@ function GetPointsHSL(data, hue, hmof ,smin,smax,lmin,lmax, w){
     for(let i = 0; i < data.length; i +=4){
         const hsl = RGBToHSL(data[i],data[i + 1],data[i + 2]);
         //console.log('index:' +i)
-        const lightnessCondition = hsl[2] >= lmin && hsl[2] <= lmax;
-        const saturationCondition = hsl[1] >= smin && hsl[1] <= smax;
         const hueCondition = compare(hsl[0]); 
-        const isPoint = hueCondition && saturationCondition && lightnessCondition ? true : false;
+        const saturationCondition = hsl[1] >= smin && hsl[1] <= smax;
+        const lightnessCondition = hsl[2] >= lmin && hsl[2] <= lmax;
+        const isPoint = hueCondition && saturationCondition && lightnessCondition;
         if(isPoint){
             //console.log('push '+i)
             points.push(DataImageIndexToPoint(i/4, w));   
@@ -235,7 +236,7 @@ function _convergePoints(points, distance){
 
 function ConvergePoints(points,tries){
     let i = 0;
-    let converged;
+    let converged = points;
     while(points.length > 4 && i < tries){
         converged = _convergePoints(points,25+i*25);
         i++;

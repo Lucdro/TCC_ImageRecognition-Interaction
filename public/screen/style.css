@@ -25,15 +25,16 @@ body{
 
     display: grid;
     place-items: center;
-    background-color: var(--bg);
+    background-color: white;
     background-image: radial-gradient(
 		ellipse,
-		var(--bg) 0%,
-		var(--off) 92%
+		white 0%,
+		var(--off) 90%
 	);
+    
     animation: on 2s linear;
 	transition: all 0.5s;
-    border-radius: 15%;
+    border-radius: 5%;
     overflow: hidden;
 
     z-index: 5;
@@ -74,4 +75,32 @@ body{
     border-radius: 5%;
     position: absolute;
     z-index: 5;
+}
+
+.info{
+    position: absolute;
+    left: 2%;
+    bottom: 2%;
+    z-index: 20;
+    width: 15%;
+    
+    padding: 10px;
+  
+    justify-content: right;
+}
+
+#siteinfo{
+    font-size: 16px;
+    color:white;
+    border-radius: 5px;
+    background-color: var(--off);
+}
+#qrcode{
+    background-color: white;
+    padding:10px;
+    width: 40%;
+}
+
+#qrcode > img{
+    width: 100%;
 }
