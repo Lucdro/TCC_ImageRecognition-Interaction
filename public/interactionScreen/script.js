@@ -10,15 +10,19 @@ const socket = io();
 //CONFIGS
 const clickCoolDown = 250;
 var pointHUE = 0;
-const hueOffset = 40;
+const hueOffset = 8;
 var saturation = 0;
-const sOffset = 20;
+const sOffset = 30;
 var lumination = 0;
-const lOffset = 10;
+const lOffset = 20;
 const maxWidth = 1280;
 const maxHeight = 720;
 
-const convergenceTries = 0;
+const hslShift = [
+    0,-5,-30
+]
+
+const convergenceTries = 12;
 
 const setRearCamera = async () =>{
     if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
@@ -202,10 +206,14 @@ function GetPointsHSL(data, hue, hmof ,smin,smax,lmin,lmax, w){
     const points = [];
     for(let i = 0; i < data.length; i +=4){
         const hsl = RGBToHSL(data[i],data[i + 1],data[i + 2]);
+        hsl[0] += hslShift[0];
+        hsl[0] = hsl[0] > 359 ? hsl[0]%359 : hsl[0] < 0 ? 359 + hsl[0]%359 : hsl[0];
+        hsl[1] += hslShift[1];
+        hsl[2] += hslShift[2];
         //console.log('index:' +i)
         const hueCondition = compare(hsl[0]); 
-        const saturationCondition = hsl[1] >= smin && hsl[1] <= smax;
-        const lightnessCondition = hsl[2] >= lmin && hsl[2] <= lmax;
+        const saturationCondition = hsl[1] >= smin && hsl[1] <= smax && hsl[1] > 10 && hsl[1] < 90;
+        const lightnessCondition = hsl[2] >= lmin && hsl[2] <= lmax && hsl[2] > 10 && hsl[2] < 90;
         const isPoint = hueCondition && saturationCondition && lightnessCondition;
         if(isPoint){
             //console.log('push '+i)
@@ -438,7 +446,7 @@ const interagir = async function(){
     let newDate = new Date();
     if(newDate.getTime() - lastclick.getTime() < clickCoolDown){return;}
     lastclick = newDate;
-    if(!stream){alert('Por favor libere o acesso à câmera e reinicie a página!'); return;}
+    if(!stream){alert('Por favor libere o acesso à câmera e reinicie a página!'); return;}  
     canvasTemp.width = camera.videoWidth;
     canvasTemp.height = camera.videoHeight;
     ctx = canvasTemp.getContext('2d');

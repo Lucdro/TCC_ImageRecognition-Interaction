@@ -68,7 +68,7 @@ class FadeinImage{
         this.ctx = ctx;
         this.position = pos;
     }
-    fAn = 30;
+    fAn = 120;
     nAn = 1;
     loopcount = 0;
     loopmax = 3;
