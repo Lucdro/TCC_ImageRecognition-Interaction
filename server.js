@@ -8,7 +8,7 @@ const { Server } = require("socket.io");
 const port = process.env.PORT || 8443;
 
 const _networkInterfaces = networkInterfaces();
-const ip = (_networkInterfaces['Wi-Fi'] || _networkInterfaces['Ethernet 2']).find(ip => ip.family == 'IPv4')?.address || 'localhost';
+const ip = (_networkInterfaces['Wi-Fi'] || _networkInterfaces['wlp3s0'] || _networkInterfaces['Ethernet 2']).find(ip => ip.family == 'IPv4')?.address || 'localhost';
 
 const cert = readFileSync(join(__dirname, 'certificate/selfsigned.crt'), 'utf8');
 const key = readFileSync(join(__dirname, 'certificate/selfsigned.key'), 'utf8');
