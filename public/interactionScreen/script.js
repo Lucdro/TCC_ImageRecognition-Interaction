@@ -4,6 +4,7 @@ const ctxOut = out.getContext('2d');
 const canvasTemp = document.createElement('canvas');
 var ctx;
 const btnInteragir = document.getElementById('btnInteragir');
+const btnCalibrar = document.getElementById('btnCalibrar');
 var lastclick = new Date();
 var stream;
 const socket = io();
@@ -18,7 +19,7 @@ const lOffset = 20;
 const maxWidth = 1280;
 const maxHeight = 720;
 
-const hslShift = [
+let hslShift = [
     0,-5,-30
 ]
 
@@ -436,9 +437,11 @@ function SendPositionToScreen(position){
 window.addEventListener('load', function() {
     setRearCamera();
     SetColor([260,40,60],true);
-    btnInteragir.addEventListener('click', interagir)
+    btnInteragir.addEventListener('click', interagir);
+    btnCalibrar.addEventListener('click', calibrar_cor);
     socket.on('changeColor',(color) => {
         SetColor(color.color, color.type == 'hsl');
+        showAlert(`hsl(${color.color[0]},${color.color[1]},${color.color[2]})`,`Cor selecionada: H:${color.color[0]} S:${color.color[1]} L:${color.color[2]}`)
     });
 });
 
@@ -461,4 +464,27 @@ const interagir = async function(){
     }
     console.log(normalizedPosition)
     SendPositionToScreen(normalizedPosition);
+}
+
+const calibrar_cor = async function(){
+    if(!stream){alert('Por favor libere o acesso à câmera e reinicie a página!'); return;}
+
+    canvasTemp.width = camera.videoWidth;
+    canvasTemp.height = camera.videoHeight;
+    ctx = canvasTemp.getContext('2d');
+    ctx.drawImage(camera,0,0);
+    const meio = {
+        x: Math.round(camera.videoWidth/2),
+        y: Math.round(camera.videoHeight/2),
+    }
+    const scan = ctx.getImageData(meio.x,meio.y,1,1).data;
+    showAlert(`rgb(${scan[0]},${scan[1]},${scan[2]})`,`Cor scaneada: R:${scan[0]} G:${scan[1]} B:${scan[2]}`)
+    SetColor(scan, false);
+    hslShift = [0,0,0];
+}
+
+function showAlert(color,message) {
+    var alertDiv = document.getElementById("alert");
+    alertDiv.innerHTML = message;
+    alertDiv.style.backgroundColor = color;
 }
