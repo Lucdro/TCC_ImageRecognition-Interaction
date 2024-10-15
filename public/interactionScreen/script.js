@@ -11,7 +11,7 @@ const socket = io();
 //CONFIGS
 const clickCoolDown = 250;
 var pointHUE = 0;
-const hueOffset = 8;
+const hueOffset = 45;
 var saturation = 0;
 const sOffset = 30;
 var lumination = 0;
@@ -20,7 +20,7 @@ const maxWidth = 1280;
 const maxHeight = 720;
 
 let hslShift = [
-    0,-5,-30
+    0,0,0
 ]
 
 const convergenceTries = 12;
